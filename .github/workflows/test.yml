@@ -1,0 +1,57 @@
+name: unit-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: 'enter what you want to orint'
+        default: 'Hello'
+        required: true
+        type: string
+
+  env:
+    firstName: 'Autmn'
+    webSite: 'testing mini bites'
+
+    jobs:
+      context-demo:
+        timeout-minutes: 10
+        continues-on-error: false
+        cotainer:
+          image: selenium/standalone-chrome:latest
+        runs-on: ${{ matrix.os }}"
+        strategy:
+          matrix:
+            os: [ubuntu-latest]
+            steps:
+              -
+                - run: echo  ${{ inputs.text }}
+                - run:  echo  ${{ github.event.inputs.text }}
+                - run:  echo  ${{ github.actor }}
+                - run: echo 'Hi ${{ env.firstName }} ${{ env.webSite }}'
+                - run: echo ${{ github.status }}
+                - run: echo ${{ github.workflow }}
+                - run: echo ${{ github.event_name }}
+                - run: echo ${{ secrets.PASSWORD  }} $ {{env.firstName}}
+                  env:
+                    firstName: 'Autmn'
+
+                    context-demo2:
+                    needs: [ context-demo ]
+                    runs-on: ubuntu-latest
+                    steps:
+                      - run: echo 'context-demo2 runnimg after context-demo'
+
+                        job3:
+                          runs-on: ubuntu-latest
+                          if: ${{ always()}}
+                          needs: [ context-demo ]
+                          steps:
+                            - run: echo 'job3 runnimg after context-demo2'
+
+                              job4:
+                                runs-on: ubuntu-latest
+                                if: ${{ failure()}}
+                                needs: [ context-demo ]
+                                steps:
+                                  - run: echo 'job4 runnimg after context-demo2'
