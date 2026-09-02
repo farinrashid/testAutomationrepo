@@ -1,57 +1,61 @@
-name: unit-test
+
+name: Context Demo
 
 on:
   workflow_dispatch:
     inputs:
       text:
-        description: 'enter what you want to orint'
+        description: 'Enter what you want to print'
         default: 'Hello'
         required: true
         type: string
 
-  env:
-    firstName: 'Autmn'
-    webSite: 'testing mini bites'
+env:
+  firstName: 'Autmn'
+  webSite: 'testing mini bites'
 
-    jobs:
-      context-demo:
-        timeout-minutes: 10
-        continues-on-error: false
-        cotainer:
-          image: selenium/standalone-chrome:latest
-        runs-on: ${{ matrix.os }}"
-        strategy:
-          matrix:
-            os: [ubuntu-latest]
-            steps:
-              -
-                - run: echo  ${{ inputs.text }}
-                - run:  echo  ${{ github.event.inputs.text }}
-                - run:  echo  ${{ github.actor }}
-                - run: echo 'Hi ${{ env.firstName }} ${{ env.webSite }}'
-                - run: echo ${{ github.status }}
-                - run: echo ${{ github.workflow }}
-                - run: echo ${{ github.event_name }}
-                - run: echo ${{ secrets.PASSWORD  }} $ {{env.firstName}}
-                  env:
-                    firstName: 'Autmn'
+jobs:
+  context-demo:
+    timeout-minutes: 10
+    continue-on-error: false
+    container:
+      image: selenium/standalone-chrome:latest
 
-                    context-demo2:
-                    needs: [ context-demo ]
-                    runs-on: ubuntu-latest
-                    steps:
-                      - run: echo 'context-demo2 runnimg after context-demo'
+    runs-on: ${{ matrix.os }}
 
-                        job3:
-                          runs-on: ubuntu-latest
-                          if: ${{ always()}}
-                          needs: [ context-demo ]
-                          steps:
-                            - run: echo 'job3 runnimg after context-demo2'
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
 
-                              job4:
-                                runs-on: ubuntu-latest
-                                if: ${{ failure()}}
-                                needs: [ context-demo ]
-                                steps:
-                                  - run: echo 'job4 runnimg after context-demo2'
+    steps:
+      - run: echo "${{ inputs.text }}"
+      - run: echo "${{ github.event.inputs.text }}"
+      - run: echo "${{ github.actor }}"
+      - run: echo "Hi ${{ env.firstName }} ${{ env.webSite }}"
+      - run: echo "${{ github.status }}"
+      - run: echo "${{ github.workflow }}"
+      - run: echo "${{ github.event_name }}"
+      - run: echo "${{ secrets.PASSWORD }} ${{ env.firstName }}"
+        env:
+          firstName: 'Autmn'
+
+  context-demo2:
+    needs: [context-demo]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 'context-demo2 running after context-demo'
+
+  job3:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [context-demo2]
+    steps:
+      - run: echo 'job3 running after context-demo2'
+
+  job4:
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    needs: [context-demo2]
+    steps:
+      - run: echo 'job4 running after context-demo2'
+```
