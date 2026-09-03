@@ -7,6 +7,7 @@ on:
         description: "What do you want to print?"
         required: true
         default: "Hello"
+        type: string
 
 jobs:
   test:
